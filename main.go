@@ -9,9 +9,11 @@ import (
 	"github.com/nireo/port-scanner/utils"
 )
 
+var address string
+
 func worker(ports, results chan int) {
 	for p := range ports {
-		address := fmt.Sprintf("scanme.nmap.org:%d", p)
+		address := fmt.Sprintf("%s:%d", address, p)
 		conn, err := net.Dial("tcp", address)
 		if err != nil {
 			results <- 0
@@ -25,11 +27,20 @@ func main() {
 	var portsString string
 	flag.StringVar(&portsString, "ports", "", "enter specific ports to be scanned separated by commans i.e: 1,8008,3001")
 
-	if portsString == "" {
-		ports := make(chan int, 100)
-		results := make(chan int)
-		var openPorts []int
+	var addressFlag string
+	flag.StringVar(&addressFlag, "address", "", "enter the address you want to scan")
 
+	if addressFlag == "" {
+		fmt.Println("ERROR: You need to provide an address!")
+		return
+	}
+	address = addressFlag
+
+	ports := make(chan int, 100)
+	results := make(chan int)
+	var openPorts []int
+
+	if portsString == "" {
 		for i := 0; i < cap(ports); i++ {
 			go worker(ports, results)
 		}
@@ -55,9 +66,6 @@ func main() {
 		}
 	} else {
 		formattedPorts := utils.SeparatePortsFromString(portsString)
-		ports := make(chan int, 100)
-		results := make(chan int)
-		var openPorts []int
 
 		for i := 0; i < cap(ports); i++ {
 			go worker(ports, results)
