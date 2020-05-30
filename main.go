@@ -58,12 +58,6 @@ func main() {
 			}
 		}
 
-		close(ports)
-		close(results)
-		sort.Ints(openPorts)
-		for _, port := range openPorts {
-			fmt.Printf("%d open\n", port)
-		}
 	} else {
 		formattedPorts := utils.SeparatePortsFromString(portsString)
 
@@ -83,13 +77,12 @@ func main() {
 				openPorts = append(openPorts, port)
 			}
 		}
-
-		close(ports)
-		close(results)
-		sort.Ints(openPorts)
-		for _, port := range openPorts {
-			fmt.Printf("%d open\n", port)
-		}
 	}
 
+	close(ports)
+	close(results)
+	sort.Ints(openPorts)
+	for _, port := range openPorts {
+		fmt.Printf("%d open\n", port)
+	}
 }
